@@ -3,7 +3,7 @@ var app = express();
 
 require('./bootstrap/view')(app);
 require('./bootstrap/mongo')(app);
-require('./bootstrap/server')(app);
+require('./bootstrap/middleware')(app);
 
 require('./http/routes')(app);
 
