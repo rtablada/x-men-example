@@ -29,57 +29,26 @@ server_swap           = "1024" # Options: false | int (MB) - Guideline: Between 
 server_timezone  = "UTC"
 
 # Database Configuration
-mysql_root_password   = "root"   # We'll assume user "root"
-mysql_version         = "5.5"    # Options: 5.5 | 5.6
-mysql_enable_remote   = "false"  # remote access enabled when true
-pgsql_root_password   = "root"   # We'll assume user "root"
 mongo_enable_remote   = "false"  # remote access enabled when true
-
-# Languages and Packages
-php_timezone          = "UTC"    # http://php.net/manual/en/timezones.php
-php_version           = "5.6"    # Options: 5.5 | 5.6
-ruby_version          = "latest" # Choose what ruby version should be installed (will also be the default version)
-ruby_gems             = [        # List any Ruby Gems that you want to install
-  #"jekyll",
-  #"sass",
-  #"compass",
-]
-
-# To install HHVM instead of PHP, set this to "true"
-hhvm                  = "false"
-
-# PHP Options
-composer_packages     = [        # List any global Composer packages that you want to install
-  #"phpunit/phpunit:4.0.*",
-  #"codeception/codeception=*",
-  #"phpspec/phpspec:2.0.*@dev",
-  #"squizlabs/php_codesniffer:1.5.*",
-]
 
 # Default web server document root
 # Symfony's public directory is assumed "web"
 # Laravel's public directory is assumed "public"
 public_folder         = "/vagrant"
 
-laravel_root_folder   = "/vagrant/laravel" # Where to install Laravel. Will `composer install` if a composer.json file exists
-laravel_version       = "latest-stable" # If you need a specific version of Laravel, set it here
-symfony_root_folder   = "/vagrant/symfony" # Where to install Symfony.
-
 nodejs_version        = "latest"   # By default "latest" will equal the latest stable version
 nodejs_packages       = [          # List any global NodeJS packages that you want to install
+  "express-generator",
   "forever",
   "nodemon"
 ]
-
-sphinxsearch_version  = "rel22" # rel20, rel21, rel22, beta, daily, stable
-
 
 Vagrant.configure("2") do |config|
 
   # Set server to Ubuntu 14.04
   config.vm.box = "ubuntu/trusty64"
 
-  config.vm.define "BaconBots" do |vapro|
+  config.vm.define "Express Starter" do |vapro|
   end
 
   if Vagrant.has_plugin?("vagrant-hostmanager")
@@ -106,7 +75,7 @@ Vagrant.configure("2") do |config|
   # If using VirtualBox
   config.vm.provider :virtualbox do |vb|
 
-    vb.name = "BaconBots"
+    vb.name = "Express Starter"
 
     # Set server cpus
     vb.customize ["modifyvm", :id, "--cpus", server_cpus]
@@ -186,16 +155,15 @@ Vagrant.configure("2") do |config|
   # Provision MongoDB
   config.vm.provision "shell", path: "#{github_url}/scripts/mongodb.sh", args: mongo_enable_remote
 
+
   ####
   # In-Memory Stores
   ##########
 
-  # Provision Redis (without journaling and persistence)
-  config.vm.provision "shell", path: "#{github_url}/scripts/redis.sh"
-
   # Provision Redis (with journaling and persistence)
   config.vm.provision "shell", path: "#{github_url}/scripts/redis.sh", args: "persistent"
   # NOTE: It is safe to run this to add persistence even if originally provisioned without persistence
+  # config.vm.provision "shell", path: "#{github_url}/scripts/zeromq.sh"
 
   ####
   # Additional Languages
@@ -210,7 +178,6 @@ Vagrant.configure("2") do |config|
   # Add these to the same directory as the Vagrantfile.
   ##########
   config.vm.provision "shell", path: "./_provisioning/nginx.sh"
-
-  config.vm.provision "shell", path: "./_provisioning/mongodb.sh"
+  config.vm.provision "shell", path: "./_provisioning/mongo.sh"
 
 end

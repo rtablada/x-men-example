@@ -1,7 +1,21 @@
-var index = require('./controllers/index');
-var users = require('./controllers/users');
+var express = require('express'),
+    router = express.Router(),
+    adminRouter = express.Router(),
+    apiRouter = express.Router(),
 
-module.exports = function(app) {
-    app.use('/', index);
-    app.use('/users', users);
-};
+    authFilter = require('./filters/auth'),
+
+    adminHomeResource = require('./resources/admin/home'),
+    adminUserResource = require('./resources/admin/users'),
+
+    sessionResource = require('./resources/session');
+
+adminRouter.use(authFilter);
+adminRouter.use('/', adminHomeResource);
+adminRouter.use('/users', adminUserResource);
+
+router.use('/admin', adminRouter);
+router.use('/api', apiRouter);
+router.use('/', sessionResource);
+
+module.exports = router;

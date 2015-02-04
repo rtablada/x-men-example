@@ -1,23 +1,30 @@
 server {
-    listen 80;
+	listen 80;
+	root /vagrant/public;
+	index index.html;
 
-    root /vagrant;
-    index index.html index.htm index.php app.php app_dev.php;
+	server_name 192.168.22.10.xip.io;
 
-    # Make site accessible from ...
-    server_name 192.168.22.10.xip.io vaprobash.dev;
+	location @proxy {
+		proxy_pass http://localhost:3000;
 
-    access_log /var/log/nginx/vagrant.com-access.log;
-    error_log  /var/log/nginx/vagrant.com-error.log error;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection 'upgrade';
+		proxy_set_header Host $host;
+		proxy_cache_bypass $http_upgrade;
+	}
 
-    charset utf-8;
+	location / {
+		root /vagrant/public;
+		try_files $uri $uri/ @proxy;
 
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
+		error_page 404 @proxy;
+		error_page 403 @proxy;
+	}
+
+	access_log /var/log/nginx/vagrant.com-access.log;
+	error_log /var/log/nginx/vagrant.com-error.log error;
+
+	charset utf-8;
 }
