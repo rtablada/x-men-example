@@ -1,8 +1,8 @@
 var session = require('express-session');
 var flash = require('express-flash');
-var flashError = require('../middleware/flash-error');
-var redirectHelpers = require('../middleware/redirect-helpers');
-var oldInput = require('../middleware/old-input');
+var flashError = require('../app/middleware/flash-error');
+var redirectHelpers = require('../app/middleware/redirect-helpers');
+var oldInput = require('../app/middleware/old-input');
 var RedisStore = require('connect-redis')(session);
 
 module.exports = function (app) {

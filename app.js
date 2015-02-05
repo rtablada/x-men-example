@@ -8,11 +8,11 @@ require('./bootstrap/session')(app);
 require('./bootstrap/views')(app);
 require('./bootstrap/mail')(app);
 require('./bootstrap/mongo');
-require('./models');
+require('./app/models');
 require('./bootstrap/passport')(app);
-require('./transformers');
+require('./app/transformers');
 
-var routes = require('./http/routes');
+var routes = require('./app/http/routes');
 app.use('/', routes);
 
 require('./bootstrap/errors')(app);
