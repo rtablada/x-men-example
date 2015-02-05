@@ -1,5 +1,5 @@
 require('./../bootstrap/mongo');
-require('./../models');
+require('./../app/models');
 
 var prompt = require('prompt'),
 	mongoose = require('mongoose'),
