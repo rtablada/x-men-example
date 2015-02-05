@@ -2,27 +2,26 @@ var gulp = require('gulp'),
     watch = require('gulp-watch'),
     notify = require('gulp-notify'),
     mocha = require('gulp-mocha'),
+    run = require('gulp-run'),
     _ = require('lodash');
+
+function handleError(self, err) {
+    self.emit('end');
+};
 
 gulp.task('mocha', function() {
     return gulp.src(['tests/**/*.js'], { read: false })
-        .pipe(mocha({ reporter: 'nyan' }))
-        .on('error', notify.onError(testNotification('fail', 'mocha')))
-        .pipe(notify(testNotification('pass', 'mocha')));
+        .pipe(run('clear'))
+        .pipe(mocha({ reporter: 'spec' }))
+        .on('error', function(err) {
+            handleError(this, err);
+            notify.onError({ title: 'Fail', message: 'All your base are belong to us!'})(err);
+        })
+        .pipe(notify({ title: 'Success', message: 'Your tests passed!'}));
 });
 
 gulp.task('watch', function() {
-    watch(['tests/**/*.js', 'app/**/*.js'], ['mocha']);
+    return gulp.watch(['tests/**/*.js', 'app/**/*.js'], ['mocha']);
 });
 
-gulp.task('default', ['mocha', 'watch']);
-
-
-function testNotification(status, pluginName) {
-    var options = {
-        title:   ( status == 'pass' ) ? 'Tests Passed' : 'Tests Failed',
-        message: ( status == 'pass' ) ? '\n\nAll tests have passed!\n\n' : '\n\nOne or more tests failed...\n\n',
-        icon:    __dirname + '/node_modules/gulp-' + pluginName +'/assets/test-' + status + '.png'
-    };
-    return options;
-}
+gulp.task('default', ['watch', 'mocha']);
