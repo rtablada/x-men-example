@@ -7,6 +7,7 @@ require('./bootstrap/middleware')(app);
 require('./bootstrap/session')(app);
 require('./bootstrap/views')(app);
 require('./bootstrap/mongo');
+require('./bootstrap/mail');
 require('./models');
 require('./bootstrap/passport')(app);
 require('./transformers');

@@ -1,0 +1,13 @@
+{
+  "email": {
+    "transport": "SMTP",
+    "config": {
+      "service": "Mandrill",
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
+    },
+    "defaultFromEmail": ""
+  }
+}
