@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "bcrypt": "^0.8.0",
+    "bcrypt": "^0.8.1",
     "body-parser": "~1.8.1",
     "config": "^1.10.0",
     "connect-redis": "^2.1.0",
