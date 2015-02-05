@@ -3,12 +3,13 @@ var router = express.Router();
 var passport = require('passport');
 var mongoose = require('mongoose'),
     User = mongoose.model('User');
-var createToken = require('./../../services/token-broker');
+var tokenBroker = require('./../../services/token-broker');
 
 var config = require('config');
 
-var tokenCreateError = function (req, res) {
-    req.flash('danger', 'The user with your email was not found.');
+
+var flashError = function (req, res, message) {
+    req.flash('danger', message);
 
     res.withInput().redirectBack();
 };
@@ -22,19 +23,16 @@ router.get('/', function (req, res) {
 router.post('/', function (req, res) {
     User.findOne({email: req.body.email}, function (err, user) {
         if (err || !user) {
-            tokenCreateError(req, res);
+            flashError(req, res, 'The user with your email was not found.');
             return;
         }
 
-        var token = createToken(user);
-        var resetUrl = req.protocol + '://' + req.get('host') + '/reset' + token;
-
-        res.send(token);
-        return;
+        var token = tokenBroker.create(user);
+        var resetUrl = req.protocol + '://' + req.get('host') + '/reset/' + token;
 
         res.mailer.send('emails/reset-password', {
             to: user.email,
-            resetUrl: token,
+            resetUrl: resetUrl,
             subject: 'Password Reset'
         }, function (err) {
             if (err) {
@@ -47,11 +45,51 @@ router.post('/', function (req, res) {
     });
 });
 
-router.all('/logout', function (req, res) {
-    req.logOut();
-    req.flash('success', 'You have logged out');
+router.get('/:token', function(req, res) {
+    res.render('password-reset/update', {token: req.params.token});
+});
 
-    res.redirect('/login');
+router.post('/:token', function(req, res) {
+    if (req.params.token !== req.body.token) {
+        flashError(req, res, 'Invalid token');
+        return;
+    }
+
+    if (! (req.body.email && req.body.password && req.body.password_confirmation)) {
+        flashError(req, res, 'All fields are required.');
+        return;
+    }
+
+    if (req.body.password && req.body.password !== req.body.password_confirmation) {
+        flashError(req, res, 'Password and password confirmation do not match.');
+        return;
+    }
+
+    User.findOne({email: req.body.email}, function(err, user) {
+        if (err || !user) {
+            flashError(req, res, 'This user does not exist.');
+        }
+
+        tokenBroker.validate(user.email, req.params.token, function(err) {
+            if (err) {
+                flashError(req, res, 'Your token has expired or does not match, please request a new one.');
+                return;
+            } else {
+                user.set('password', req.body.password);
+                user.save(function(err, user) {
+                    if (err) {
+                        console.log(err);
+                        flashError(req, res, 'There was an unexpected error setting your password.');
+                        return;
+                    }
+                    tokenBroker.expire(req.params.token);
+                    req.flash('success', 'You have reset your password, please login.');
+
+                    return res.redirect('/login');
+                });
+            }
+        });
+    })
 });
 
 module.exports = router;
