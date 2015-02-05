@@ -1,44 +1,81 @@
-# Express Test
+# Express Shell
 
-This is just a playground for me to mess about with various things with Express.
+This repo is a base shell to get up and running with Express Apps.
+It is heavily influenced by the work that I did while creating the "Express Zero to Sixty" course for [EmberGrep](https://embergrep.com).
 
-## Current Agenda
+## Features
 
-1. Clean Up Startup
+* Modified Express Starter Kit
+* SB Admin Bootstrap
+* App Skeleton
+* Authentication
+* Express Session (with Redis and Flash vars)
+* Mail Driver
+* Old Input Middleware
+* Form Input Helpers
+* User Auth with Passport
+* User Creator CLI
+* Password Reset With Email and Password Tokens
+* Basic Config
+* Vagrant File
 
-The first thing that really bugged me coming into Express was how the convention is to have a huge `app.js` file that does all of your bootstrapping for your app.
-I mean, this really bugged me, just after 2 little bits of middleware, a mongoose connection, and an extra view engines: the app.js file became unwieldy!
-Things were mucking about and my file had about 12 require statements.
+## Still to Come
 
-So far, I've moved various groups of components to their own file within a `bootstrap` directory.
-This has cut my `app.js` to a readable and organized 12 lines (with spacing).
+* Testing Setup
+* Config for Mongo
+* Config for Redis
+* CSRF
+* Configuration with .env instead of config.json
 
-2. Organize Routes as Controllers
+## Developing From this Base
 
-Out of the box, Express comes with a `routes` directory, which has files for each route group that is later registered with the application.
-It works, but `routes` doesn't quite feel the right word for things.
+This base app is set up to get rid of the headache of the "stuff you need to make an app".
+So at least for a little while, this will get you pretty far into developing your Express apps.
+To get started developing locally you only need to do five things.
 
-While I realize that they aren't really controllers since they do not share an identity as an instantiated object, I do feel controller is a bit of a better term for these files.
-To manage this, I renamed the `routes` directory to `controllers`.
+1. Copy `config/default.json.example` to `config/default.json` and update mail configuration in that file.
+2. Run `vagrant up`
+3. SSH into vagrant (`vagrant ssh`), `cd /vagrant`, and run `nodemon -L` to run a auto restarting express server!
+4. Visit your new server on `192.168.22.10/admin`
+5. Bro Down
 
-Along with this, I needed a way to have all of my route registration in one place, so I created a `routes.js` file to be my main entry point into registering application routes.
+## Creating a User
 
-3. Break Out HTTP
+By default, this project ships with no front-end, just the routes and logic for logging in,
+resetting your password, a blank admin dashboard, and user CRUD.
+But, you can't get to half of this because you don't have a user to login with.
 
-While 90% of what my application will be doing is responding to HTTP requests, I still wanted to move my `HTTP` logic into its own directory to keep it mentally separate from future domain logic.
-This now includes:
+In your Vagrant box run `node /vagrant/bin/create-user.js` which will interactively create your first users for the system.
 
-```
-http
-|--/controllers/
-|  |--/index.js
-|  |--/users.js
-|--/routes.js
-```
+After this you can login and create users from the admin dashboard.
 
-4. Load Models
+## Conventions
 
-I'm still at a bit of a loss about what to do for loading my models.
-I don't want to put it in the project bootstrap since IMO that directory should stay the same unless new middlewares or domain layers are introduced.
-I've thought about an autoloader like [requireindex](https://github.com/stephenhandley/requireindex), but I'm not sure that I want the cost of extra file reads just to boot up the app.
-So... I'm looking for suggestions!
+View templates are located in `resources/templates`.
+Routes are registered in `http/routes.js` and the resources for the various routes are in `http/resources`.
+
+Everything else is pretty standard.
+
+## License - MIT
+
+The MIT License (MIT)
+
+Copyright (c) [year] [fullname]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
