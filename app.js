@@ -6,13 +6,13 @@ var app = express();
 require('./bootstrap/middleware')(app);
 require('./bootstrap/session')(app);
 require('./bootstrap/views')(app);
-require('./bootstrap/mail')(app);
 require('./bootstrap/mongo');
 require('./app/models');
-require('./bootstrap/passport')(app);
 require('./app/transformers');
 
+var xmen = require('./bin/xmen');
 var routes = require('./app/http/routes');
+app.use(xmen);
 app.use('/', routes);
 
 require('./bootstrap/errors')(app);

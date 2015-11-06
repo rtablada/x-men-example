@@ -1,4 +1,4 @@
 module.exports = {
-    NewsArticle: require('./news-article'),
-    User: require('./user')
+  Person: require('./person'),
+  Book: require('./book'),
 };
