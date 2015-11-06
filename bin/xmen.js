@@ -1,4 +1,5 @@
 var Mongoose = require('mongoose');
+var Mystique = require('mystique');
 var _ = require('lodash');
 var url = require('url');
 
@@ -17,6 +18,22 @@ module.exports = function(req, res, next) {
         .exec((err, results) => {
           res.send(results);
         });
+    },
+
+    createRecord(modelName, options) {
+      var Transformer = Mystique.getTransformer(modelName);
+
+      var data = Transformer.rawItem(req, Transformer.mapIn);
+      var Model = Mongoose.model(modelName);
+
+      var model = new Model(data);
+      model.save((err) => {
+        if (err) {
+          return res.send({err});
+        }
+
+        res.send(model.toObject());
+      });
     },
   };
 
