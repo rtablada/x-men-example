@@ -30,6 +30,8 @@ module.exports = function(req, res, next) {
       options = options || {};
       options.include = options.include || [];
       var beforeSave = options.beforeSave || defaultBeforeSave;
+      var afterSave = options.afterSave || () => {};
+
       var Transformer = Mystique.getTransformer(modelName);
 
       var data = Transformer.rawItem(req, Transformer.mapIn);
@@ -44,6 +46,8 @@ module.exports = function(req, res, next) {
 
           model.populate(options.include, () => {
             res.send(model.toObject());
+
+            afterSave(model);
           });
         });
       });

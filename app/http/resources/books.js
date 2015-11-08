@@ -20,6 +20,13 @@ router.post('/', function(req, res) {
       book.author = '563ed344bd48dfad25a9dbd2';
       save();
     },
+
+    afterSave: (book) => {
+      var author = book.author;
+
+      author.books.push(book);
+      author.save();
+    },
   });
 });
 
