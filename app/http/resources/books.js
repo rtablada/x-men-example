@@ -18,7 +18,13 @@ router.get('/:id', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-  return req.store.createRecord('Book');
+  return req.store.createRecord('Book', {
+    include: ['author'],
+    beforeSave: (book, save) => {
+      book.author = '563ed344bd48dfad25a9dbd2';
+      save();
+    },
+  });
 });
 
 module.exports = router;

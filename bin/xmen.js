@@ -3,6 +3,10 @@ var Mystique = require('mystique');
 var _ = require('lodash');
 var url = require('url');
 
+var defaultBeforeSave = (model, save) => {
+  save();
+};
+
 module.exports = function(req, res, next) {
   req.store = {
     // req.store.recordCollection('Book', {indlude: ['author'], queryBy: ['year'], orderBy: 'year'});
@@ -25,18 +29,23 @@ module.exports = function(req, res, next) {
     createRecord(modelName, options) {
       options = options || {};
       options.include = options.include || [];
+      var beforeSave = options.beforeSave || defaultBeforeSave;
       var Transformer = Mystique.getTransformer(modelName);
 
       var data = Transformer.rawItem(req, Transformer.mapIn);
       var Model = Mongoose.model(modelName);
 
       var model = new Model(data);
-      model.save((err) => {
-        if (err) {
-          return res.send({err});
-        }
+      beforeSave(model, () => {
+        model.save((err) => {
+          if (err) {
+            return res.send({err});
+          }
 
-        res.send(model.toObject());
+          model.populate(options.include, () => {
+            res.send(model.toObject());
+          });
+        });
       });
     },
 
