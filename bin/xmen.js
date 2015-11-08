@@ -9,6 +9,20 @@ var defaultBeforeSave = (model, save) => {
 
 module.exports = function(req, res, next) {
   req.store = {
+    renderCollection(collection, modelName, options) {
+      var Transformer = Mystique.getTransformer(modelName);
+      var output = Transformer.collection(collection, Transformer.mapOut);
+
+      res.send(output);
+    },
+
+    renderItem(model, modelName, options) {
+      var Transformer = Mystique.getTransformer(modelName);
+      var output = Transformer.item(model, Transformer.mapOut);
+
+      res.send(output);
+    },
+
     // req.store.recordCollection('Book', {indlude: ['author'], queryBy: ['year'], orderBy: 'year'});
     recordCollection(modelName, options) {
       options = options || {};
@@ -22,7 +36,7 @@ module.exports = function(req, res, next) {
         .sort(urlParts.query.orderBy || options.orderBy)
         .populate(options.include)
         .exec((err, results) => {
-          res.send(results);
+          req.store.renderCollection(results, modelName, options);
         });
     },
 
@@ -45,7 +59,7 @@ module.exports = function(req, res, next) {
           }
 
           model.populate(options.include, () => {
-            res.send(model.toObject());
+            req.store.renderItem(model, modelName, options);
 
             afterSave(model);
           });
@@ -58,10 +72,10 @@ module.exports = function(req, res, next) {
       options.include = options.include || [];
       var Model = Mongoose.model(modelName);
 
-      var query = Model.findById(id)
+      Model.findById(id)
         .populate([])
-        .exec((err, results) => {
-          res.send(results);
+        .exec((err, model) => {
+          req.store.renderItem(model, modelName, options);
         });
     },
   };
