@@ -6,7 +6,7 @@ var url = require('url');
 var Mystique = require('mystique');
 
 router.get('/', function(req, res) {
-  return req.store.recordCollection('Book', {
+  return req.store.recordCollection('Person', {
     include: ['author'],
     queryBy: ['year'],
     orderBy: 'year',
@@ -14,11 +14,11 @@ router.get('/', function(req, res) {
 });
 
 router.get('/:id', function(req, res) {
-  return req.store.recordItemById('Book', req.params.id);
+  return req.store.recordItemById('Person', req.params.id);
 });
 
 router.post('/', function(req, res) {
-  return req.store.createRecord('Book');
+  return req.store.createRecord('Person');
 });
 
 module.exports = router;
